@@ -80,7 +80,7 @@ Reveal.initialize({
 });
 ```
 
-Note that by default the latest KaTeX is loaded from a remote server (https://cdn.jsdelivr.net/npm/katex). To use a fixed version set `version` to, for example, `0.13.18`.
+Note that by default the latest KaTeX is loaded from a remote server (https://jsd.onmicrosoft.cn/npm/katex). To use a fixed version set `version` to, for example, `0.13.18`.
 
 If you want to use KaTeX offline you'll need to download a copy of the library (e.g. with npm) and use the `local` configuration option (the `version` option will then be ignored), for example:
 
@@ -100,7 +100,7 @@ Adjust options through the `mathjax2` configuration object. Below is how the plu
 ```js
 Reveal.initialize({
   mathjax2: {
-    mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+    mathjax: 'https://jsd.onmicrosoft.cn/npm/mathjax@2/MathJax.js',
     config: 'TeX-AMS_HTML-full',
     // pass other options into `MathJax.Hub.Config()`
     tex2jax: {
@@ -115,7 +115,7 @@ Reveal.initialize({
 });
 ```
 
-Note that the latest MathJax 2 is loaded from a remote server. To use a fixed version set mathjax to, for example, https://cdn.jsdelivr.net/npm/mathjax@2.7.8/MathJax.js.
+Note that the latest MathJax 2 is loaded from a remote server. To use a fixed version set mathjax to, for example, https://jsd.onmicrosoft.cn/npm/mathjax@2.7.8/MathJax.js.
 
 If you want to use MathJax offline you'll need to download a copy of the library (e.g. with npm) and point `mathjax` to the local copy.
 
@@ -126,7 +126,7 @@ Adjust options through the `mathjax3` configuration object. Below is how the plu
 ```js
 Reveal.initialize({
   mathjax3: {
-    mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+    mathjax: 'https://jsd.onmicrosoft.cn/npm/mathjax@3/es5/tex-mml-chtml.js',
     tex: {
       inlineMath: [
         ['$', '$'],
@@ -141,6 +141,6 @@ Reveal.initialize({
 });
 ```
 
-Note that the latest MathJax 3 is loaded from a remote server. To use a fixed version set `mathjax` to, for example, <https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js>. Additionally, the config is now part of of the url, by default `tex-mml-chtml` is loaded which recognizes mathematics in both TeX and MathML notation, and generates output using HTML with CSS (the CommonHTML output format). This is one of the most general configurations, but it is also one of the largest, so you might want to consider a smaller one that is more tailored to your needs, e.g. `tex-svg`.
+Note that the latest MathJax 3 is loaded from a remote server. To use a fixed version set `mathjax` to, for example, <https://jsd.onmicrosoft.cn/npm/mathjax@3.2.2/es5/tex-mml-chtml.js>. Additionally, the config is now part of of the url, by default `tex-mml-chtml` is loaded which recognizes mathematics in both TeX and MathML notation, and generates output using HTML with CSS (the CommonHTML output format). This is one of the most general configurations, but it is also one of the largest, so you might want to consider a smaller one that is more tailored to your needs, e.g. `tex-svg`.
 
 If you want to use MathJax offline you'll need to download a copy of the library (e.g. with npm) and adjust `mathjax` accordingly.

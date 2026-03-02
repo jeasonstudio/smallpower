@@ -377,7 +377,7 @@ Use a distinctive display face for headings and a separate body face for text-he
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@9..40&family=Manrope:wght@400;500;700;800&display=swap');
 
 .reveal {
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'TsangerJinKai02', 'Manrope', 'Segoe UI', sans-serif;
 }
 
 .reveal h1,

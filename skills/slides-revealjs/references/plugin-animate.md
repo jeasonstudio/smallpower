@@ -9,10 +9,10 @@ A plugin for [Reveal.js](https://github.com/hakimel/reveal.js) allowing to add a
 To use the plugin include
 ```html
 <!-- Load content plugin -->
-<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/loadcontent/plugin.js"></script>
+<script src="https://jsd.onmicrosoft.cn/npm/reveal.js-plugins@latest/loadcontent/plugin.js"></script>
 <!-- Animate plugin -->
-<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/animate/plugin.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.1.2/svg.min.js"></script>
+<script src="https://jsd.onmicrosoft.cn/npm/reveal.js-plugins@latest/animate/plugin.js"></script>
+<script src="https://jsd.onmicrosoft.cn/npm/@svgdotjs/svg.js@latest/dist/svg.min.js"></script>
 ```
 to the header of your presentation and configure reveal.js and the plugin by
 
