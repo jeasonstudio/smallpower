@@ -19,11 +19,12 @@ This skill guides AI to create and update reveal.js slides quickly and reliably.
 ## Core Workflow
 
 1. Choose the integration mode: Static HTML (fastest) or npm/ESM (engineering).
-2. Build the minimal deck structure: `.reveal > .slides > section`.
-3. Register only required plugins (Markdown, Highlight, Notes, Math, Search, Zoom, etc.).
-4. Author content and interactions: horizontal/vertical slides, fragments, backgrounds, transitions, media.
-5. Configure runtime behavior: navigation, keyboard, `hash`, `slideNumber`, `autoSlide`, `view: 'scroll'`.
-6. Validate and ship: local preview, Speaker View, print/PDF export, and optional API control code.
+2. If converting from an existing doc, inventory all source sections/items first and map each item to at least one slide.
+3. Build the minimal deck structure: `.reveal > .slides > section`.
+4. Register only required plugins (Markdown, Highlight, Notes, Math, Search, Zoom, etc.).
+5. Author content and interactions: horizontal/vertical slides, fragments, backgrounds, transitions, media.
+6. Configure runtime behavior: navigation, keyboard, `hash`, `slideNumber`, `autoSlide`, `view: 'scroll'`.
+7. Validate and ship: local preview, Speaker View, print/PDF export, and optional API control code.
 
 ## Implementation Templates
 
@@ -31,10 +32,10 @@ This skill guides AI to create and update reveal.js slides quickly and reliably.
 
 ```html
 <html>
-  <head>
+  <head>ex
     <link rel="stylesheet" href="dist/reveal.css" />
-    <link rel="stylesheet" href="dist/theme/black.css" />
-    <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+    <link rel="stylesheet" href="dist/theme/solarized.css" />
+    <link rel="stylesheet" href="plugin/highlight/zenburn.css" />
   </head>
   <body>
     <div class="reveal">
@@ -70,7 +71,7 @@ import Markdown from 'reveal.js/plugin/markdown/markdown.esm.js';
 import Highlight from 'reveal.js/plugin/highlight/highlight.esm.js';
 import Notes from 'reveal.js/plugin/notes/notes.esm.js';
 import 'reveal.js/dist/reveal.css';
-import 'reveal.js/dist/theme/black.css';
+import 'reveal.js/dist/theme/white.css';
 
 const deck = new Reveal({
   hash: true,
@@ -101,6 +102,7 @@ await deck.initialize();
 - Speaker Notes: Enable Notes and press `S` for presenter view.
 - Auto-Animate: Use adjacent `<section data-auto-animate>` and `data-id` for precise matching.
 - Backgrounds: Use `data-background-*` (color/image/video/iframe).
+- Architecture diagrams: Prefer Mermaid for system/process/flow slides to increase clarity and visual consistency.
 - Scroll View: Use `view: 'scroll'` with optional `scrollSnap` and `scrollLayout`.
 - PDF: Use `?print-pdf` then browser print to PDF.
 
@@ -112,11 +114,13 @@ The items below should be preferred in this skill.
 
 Run this before considering a deck "done":
 
+- Deck defaults to a light tone unless explicitly requested otherwise (prefer official reveal `solarized` theme).
 - Aesthetic direction is explicit and consistent (not mixed styles).
 - Typography has clear hierarchy (display vs body) and readable line lengths.
 - Palette has one dominant tone and one intentional accent color.
 - At least one memorable visual motif exists (layout move, background treatment, or motion sequence).
 - Motion supports narrative pacing (not scattered decorative effects).
+- Architecture/process slides use Mermaid when applicable instead of ad-hoc ASCII bullets.
 - Slides stay readable on both desktop and mobile widths.
 
 ### 1) Title slide with custom background
@@ -481,6 +485,102 @@ Before shipping, quickly verify:
 - Slide density is controlled; no wall-of-text pages.
 - Mobile viewport still preserves hierarchy and readability.
 
+### 21) Prefer Mermaid for architecture and flow communication
+
+For system overviews, sequence explanations, data flow, and decision logic, use Mermaid slides first. This usually communicates structure faster than dense bullet lists.
+
+```html
+<section>
+  <h2>Architecture</h2>
+  <pre class="mermaid">
+flowchart LR
+  Client["Client"] -->|HTTPS| API["API Gateway"]
+  API --> Service["Application Service"]
+  Service --> DB["PostgreSQL"]
+  Service --> Queue["Background Queue"]
+  Queue --> Worker["Worker"]
+  </pre>
+</section>
+```
+
+If Mermaid plugin setup is needed:
+
+```js
+Reveal.initialize({
+  hash: true,
+  plugins: [RevealMermaid],
+});
+```
+
+Use this decision rule:
+
+- Use Mermaid for complex graphs (branching/cycles/cross-links, usually 8+ nodes).
+- For simple linear pipelines (`A -> B -> C -> D`), prefer HTML/CSS step cards because they fill slide space better and are easier to style at presentation scale.
+- Never leave a tiny Mermaid graph alone in large empty space; pair it with supporting content or switch to a split layout.
+
+### 22) Convert source documents with full coverage (no silent drops)
+
+When turning a plan/spec/review into slides:
+
+- Inventory every source item first (sections, tables, cards, decisions, details).
+- Map each item to slide(s) before writing markup.
+- Verify coverage at the end: no major section from source should be missing in the deck.
+
+If one source section has high density, split into multiple slides instead of compressing into unreadable bullets.
+
+### 23) Use slide archetypes to control pacing
+
+Build deck rhythm with explicit slide roles, not repeated generic content slides:
+
+- `Title` for opening tone.
+- `Divider` between major topics.
+- `Content` for explanation.
+- `Split` for comparison (before/after, text+diagram, problem/solution).
+- `Diagram` for structure/flow.
+- `Dashboard` for metrics/KPIs.
+- `Table` for compact factual comparison.
+- `Code` for implementation detail.
+- `Quote` for emphasis.
+- `Full-bleed` for key visual moments.
+
+Avoid long runs of the same archetype.
+
+### 24) Enforce compositional variety across consecutive slides
+
+Alternate spatial compositions through the sequence:
+
+- centered
+- left-heavy
+- right-heavy
+- split
+- edge-aligned
+- full-bleed
+
+Rule of thumb: do not use 3 consecutive slides with the same composition pattern.
+
+### 25) Keep presentation density within slide limits
+
+Use these limits by default:
+
+- Content slide: 1 heading + up to 5-6 bullets (max ~2 lines each).
+- Diagram slide: one primary diagram, usually up to 8-10 nodes at presentation size.
+- Table slide: up to ~8 rows; overflow moves to next slide.
+- Code slide: up to ~10 lines focused on one point.
+- Quote slide: short quote only; long quotes become content slides.
+
+If limits are exceeded, split into additional slides instead of shrinking text.
+
+### 26) Use presentation-scale typography baselines
+
+Slides are not documents; scale text for screen-share/projector readability:
+
+- Display/title: roughly `48-120px`
+- Heading: roughly `28-48px`
+- Body/bullets: roughly `16-24px`
+- Labels/captions: roughly `10-14px`
+
+Always prioritize readability from distance over document-like density.
+
 ## Guardrails
 
 - Do not invent reveal.js config keys; only use documented options.
@@ -490,15 +590,32 @@ Before shipping, quickly verify:
 - Treat Quarto/Pandoc-only syntax as source material, not runtime reveal.js syntax (`::: columns`, `::: notes`, `slide-level`, `markdown+emoji`, callout blocks).
 - When migrating from Quarto to reveal.js, preserve behavior first (fragment timing, navigation flow, note visibility), then adjust visual styling.
 - Do not ship visually generic decks. Each deck must have a deliberate aesthetic direction, typography system, palette strategy, and motion intent.
+- Prefer reveal official `solarized` theme for default/light-tone decks unless user requirements explicitly call for another theme.
+- Minimize new custom CSS. First use built-in reveal classes/options; add CSS only when necessary.
+- When adding CSS, scope selectors to `.reveal` or a slide-level class and verify impact scope (what selectors will match, which slides/components are affected).
+- Do not reimplement slide engines (scroll-snap containers, custom nav chrome, custom keyboard routers) when using reveal.js. Use reveal built-ins unless there is a concrete gap.
+- When borrowing HTML-slide design systems, translate the design language to reveal primitives (`section`, fragments, built-in navigation) instead of copying unrelated runtime architecture.
 
 ## Delivery Checklist
 
 - First slide renders correctly with no obvious console errors.
 - Plugin registration matches the content syntax used (Markdown/Notes/Math/Highlight/etc.).
 - Navigation and interactions match requirements (keyboard, `hash`, `slideNumber`, `autoSlide`, touch).
+- Theme defaults to official reveal `solarized` unless requirements explicitly override it.
+- If custom CSS was added, selector scope and impact were reviewed (which slides/components each rule can affect).
+- Architecture/process-heavy content uses Mermaid diagrams when appropriate.
+- Source-to-slide coverage check was completed for conversion tasks (no major source section dropped).
+- Composition rhythm was reviewed (no 3 consecutive slides with the same layout pattern).
+- Density limits were respected or split across additional slides.
 - If export is requested, verify print/PDF workflow end-to-end.
 
 ## References
+
+### External Recipe Source
+
+- [Some tips and tricks for Quarto when rendering as a reveal.js slideshow](https://www.avonture.be/blog/quarto-revealjs-tips/) (extract reveal.js-applicable patterns; ignore Quarto-only syntax)
+- [Anthropic frontend-design skill](https://raw.githubusercontent.com/anthropics/skills/refs/heads/main/skills/frontend-design/SKILL.md) (aesthetic direction, typography, color, motion, composition discipline)
+- [visual-explainer slide-patterns](https://raw.githubusercontent.com/nicobailon/visual-explainer/refs/heads/main/references/slide-patterns.md) (slide archetypes, pacing, density limits, presentation readability)
 
 ### Getting Started
 
