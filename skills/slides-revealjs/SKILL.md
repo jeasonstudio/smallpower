@@ -104,12 +104,392 @@ await deck.initialize();
 - Scroll View: Use `view: 'scroll'` with optional `scrollSnap` and `scrollLayout`.
 - PDF: Use `?print-pdf` then browser print to PDF.
 
+## Reveal.js Tips
+
+The items below should be preferred in this skill.
+
+### 30-Second Design Review Checklist
+
+Run this before considering a deck "done":
+
+- Aesthetic direction is explicit and consistent (not mixed styles).
+- Typography has clear hierarchy (display vs body) and readable line lengths.
+- Palette has one dominant tone and one intentional accent color.
+- At least one memorable visual motif exists (layout move, background treatment, or motion sequence).
+- Motion supports narrative pacing (not scattered decorative effects).
+- Slides stay readable on both desktop and mobile widths.
+
+### 1) Title slide with custom background
+
+Use an explicit first `<section>` as a title slide and style it with reveal data attributes.
+
+```html
+<section
+  id="title-slide"
+  data-background-image="./img/background.jpg"
+  data-background-size="cover"
+  data-background-opacity="0.9"
+>
+  <h1>My Slide Show</h1>
+</section>
+```
+
+### 2) Move/resize a logo after leaving title slide
+
+Use CSS classes plus the `slidechanged` event.
+Add a persistent logo element in your HTML, e.g. `<img class="slide-logo" src="./images/my-logo.svg" alt="Logo" />`.
+
+```css
+.reveal .slide-logo {
+  position: fixed;
+  display: block;
+  max-width: none !important;
+}
+
+.reveal .slide-logo-bottom-right {
+  right: 12px !important;
+  bottom: 0 !important;
+  left: auto !important;
+  max-height: 2.2rem !important;
+}
+
+.slide-logo-max-size {
+  top: 5px;
+  left: 12px;
+  right: auto !important;
+  bottom: auto !important;
+  height: 100px !important;
+  max-height: none !important;
+}
+```
+
+```js
+function syncLogoForSlide(currentSlide) {
+  const logos = document.querySelectorAll('.slide-logo');
+  const onTitle = currentSlide && currentSlide.id === 'title-slide';
+  logos.forEach((el) => {
+    el.classList.toggle('slide-logo-max-size', onTitle);
+    el.classList.toggle('slide-logo-bottom-right', !onTitle);
+  });
+}
+
+Reveal.on('ready', (event) => syncLogoForSlide(event.currentSlide));
+Reveal.on('slidechanged', (event) => syncLogoForSlide(event.currentSlide));
+```
+
+### 3) Background image sizing (`cover` vs `contain`)
+
+`cover` fills the slide and may crop. `contain` preserves the entire image.
+
+```html
+<section data-background-image="images/2024.jpg" data-background-size="cover"></section>
+<section data-background-image="images/2024.jpg" data-background-size="contain"></section>
+```
+
+### 4) Slide structure control (replacement for Quarto `slide-level`)
+
+Pure reveal.js does not use Pandoc `slide-level`. Control structure explicitly:
+
+- HTML mode: one `<section>` per slide, nested `<section>` for vertical slides.
+- Markdown mode: use configured separators (`---`, `--`) to split slides.
+
+### 5) Emoji support
+
+Quarto's `from: markdown+emoji` is not a reveal.js feature. In reveal.js:
+
+- Use native Unicode emoji directly.
+- Or render emoji through your markdown/HTML pipeline before reveal initializes.
+
+### 6) Fit large text and stretch media
+
+`r-fit-text` and `r-stretch` are reveal classes and work directly.
+
+```html
+<section>
+  <div class="r-fit-text">Big Text</div>
+</section>
+
+<section>
+  <p>Here is an image:</p>
+  <img class="r-stretch" src="image.webp" alt="Demo image" />
+  <p>Some text after the image.</p>
+</section>
+```
+
+### 7) Reveal content on key press with fragments
+
+```html
+<section>
+  <h2>It's a candy dog</h2>
+  <p style="font-size: 2em; color: #75aadb;">Would you like to see a candy dog?</p>
+  <img class="fragment fade-up" src="./images/dog.webp" alt="Candy dog" />
+</section>
+```
+
+### 8) Two-column and 4-quadrant layouts
+
+Quarto `::: columns` is not native reveal syntax. Use HTML/CSS layout wrappers.
+
+```html
+<section>
+  <div class="cols">
+    <div class="col col-70"><img src="./images/image_1.webp" alt="Left" /></div>
+    <div class="col col-30">
+      <img src="./images/image_2.webp" alt="Right top" />
+      <img src="./images/image_3.webp" alt="Right bottom" />
+    </div>
+  </div>
+</section>
+```
+
+```css
+.reveal .cols {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.reveal .col-70 { flex: 0 0 70%; }
+.reveal .col-30 { flex: 0 0 30%; }
+```
+
+For 4 quadrants, use a 2x2 CSS grid and reveal each cell with fragment classes (`fade-in-then-semi-out` or similar).
+
+### 9) Custom inline short-code transform (`==text==` -> `<mark>text</mark>`)
+
+```js
+function convertMarkedTextInSlide(slide) {
+  if (!slide) return;
+  slide.innerHTML = slide.innerHTML.replace(/==([^=]+)==/g, '<mark>$1</mark>');
+}
+
+Reveal.on('ready', (event) => convertMarkedTextInSlide(event.currentSlide));
+Reveal.on('slidechanged', (event) => convertMarkedTextInSlide(event.currentSlide));
+```
+
+### 10) Inline style and custom CSS
+
+In reveal markdown, use inline HTML for precise text styling:
+
+```html
+<p>
+  Make this <span style="color: red;">red</span> and this
+  <span style="background: yellow;">highlighted</span>.
+</p>
+```
+
+Load custom CSS in static HTML:
+
+```html
+<link rel="stylesheet" href="./assets/custom.css" />
+```
+
+Or import it in ESM:
+
+```js
+import './assets/custom.css';
+```
+
+### 11) Hide captions and style callouts when your theme emits them
+
+Reveal core does not auto-generate Quarto callouts/captions, but many pipelines output similar markup:
+
+```css
+.reveal p.caption,
+.reveal figcaption {
+  display: none;
+}
+
+.reveal .callout-title {
+  display: none;
+}
+```
+
+### 12) Vertical flow, slide IDs, menu labels, numbering, and notes
+
+- Vertical chapters: nest sections (`<section><section>Child</section></section>`).
+- Navigation behavior: use `navigationMode: 'default' | 'linear' | 'grid'`.
+- Stable slide URL names: set section `id` and enable `hash: true`.
+- Menu labels (when using the menu plugin): set `data-menu-title`.
+- Slide number with total: `slideNumber: 'c/t'`.
+- Speaker notes: `<aside class="notes">...</aside>` and press `S`.
+- Overview mode shortcut: `Esc`.
+
+```html
+<section id="intro" data-menu-title="Introduction">
+  <h2>Intro</h2>
+  <aside class="notes">Presenter-only notes</aside>
+</section>
+```
+
+```js
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  navigationMode: 'default',
+  plugins: [RevealNotes],
+});
+```
+
+### 13) Choose one bold aesthetic direction before styling
+
+Do not start from random colors and utility classes. Define a single visual direction (for example: editorial, brutalist, retro-futuristic, luxury minimal, playful) and keep every design decision aligned with it.
+
+Practical rule:
+
+- One deck, one dominant visual idea.
+- Keep typography, palette, motion, and background treatment coherent with that idea.
+
+### 14) Use deck-level design tokens (CSS variables)
+
+Create a token layer first, then style components/slides with those tokens.
+
+```css
+:root {
+  --deck-bg: #f6f3ea;
+  --deck-surface: rgba(255, 255, 255, 0.72);
+  --deck-text: #1b1a18;
+  --deck-accent: #c0392b;
+  --deck-muted: #6f6a61;
+  --deck-shadow: 0 20px 50px rgba(20, 16, 10, 0.18);
+  --deck-radius: 18px;
+  --deck-gap: 1.2rem;
+}
+
+.reveal {
+  color: var(--deck-text);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(192, 57, 43, 0.12), transparent 45%),
+    radial-gradient(circle at 88% 82%, rgba(27, 26, 24, 0.1), transparent 42%),
+    var(--deck-bg);
+}
+```
+
+### 15) Build typography hierarchy intentionally
+
+Use a distinctive display face for headings and a separate body face for text-heavy slides. Define consistent scale and line length.
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@9..40&family=Manrope:wght@400;500;700;800&display=swap');
+
+.reveal {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+.reveal p,
+.reveal li {
+  line-height: 1.45;
+  max-width: 58ch;
+}
+```
+
+### 16) Prefer dominant palette + sharp accent over evenly mixed colors
+
+A strong deck usually has:
+
+- One dominant background family.
+- One primary text color.
+- One high-contrast accent for emphasis, links, and key annotations.
+
+```css
+.reveal a,
+.reveal strong,
+.reveal mark {
+  color: var(--deck-accent);
+}
+
+.reveal mark {
+  background: transparent;
+  border-bottom: 0.2em solid color-mix(in srgb, var(--deck-accent) 35%, transparent);
+  padding: 0 0.08em;
+}
+```
+
+### 17) Compose slides with atmosphere (not flat backgrounds)
+
+Avoid plain single-color canvases by default. Add depth with subtle gradients, textures, overlays, or layered shadows that match the chosen aesthetic.
+
+```css
+.reveal .panel {
+  background: var(--deck-surface);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--deck-radius);
+  box-shadow: var(--deck-shadow);
+  backdrop-filter: blur(6px);
+  padding: calc(var(--deck-gap) * 1.2);
+}
+```
+
+### 18) Use motion as choreography, not decoration
+
+In reveal.js, prioritize:
+
+- One meaningful entry sequence per slide (`fade-up`, `fade-in`, `zoom-in` fragments with stagger).
+- Smooth global transition settings.
+- Minimal micro-animations elsewhere.
+
+```js
+Reveal.initialize({
+  transition: 'slide',
+  backgroundTransition: 'fade',
+  autoAnimateEasing: 'ease-out',
+  autoAnimateDuration: 0.6,
+});
+```
+
+```html
+<section>
+  <h2 class="fragment fade-in">Problem</h2>
+  <p class="fragment fade-up">Constraint</p>
+  <p class="fragment fade-up">Decision</p>
+  <p class="fragment fade-up">Outcome</p>
+</section>
+```
+
+### 19) Break predictable layouts with controlled asymmetry
+
+Avoid centering everything. Mix alignment, width, overlap, and whitespace intentionally.
+
+```css
+.reveal .asym {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+  align-items: end;
+}
+
+.reveal .asym .media {
+  transform: translateY(1rem);
+}
+```
+
+### 20) Final anti-generic design pass
+
+Before shipping, quickly verify:
+
+- Font choice is intentional and not default/generic.
+- Color system has a dominant tone plus a clear accent.
+- At least one memorable visual motif exists (background treatment, type lockup, layout move, or motion sequence).
+- Slide density is controlled; no wall-of-text pages.
+- Mobile viewport still preserves hierarchy and readability.
+
 ## Guardrails
 
 - Do not invent reveal.js config keys; only use documented options.
 - Do not use plugin syntax before registering the corresponding plugin (Markdown/Math/Notes/Highlight, etc.).
 - For multi-instance pages, prefer `new Reveal(rootEl, config)` with `embedded: true`.
 - In React, avoid duplicate initialization and call `destroy()` on unmount.
+- Treat Quarto/Pandoc-only syntax as source material, not runtime reveal.js syntax (`::: columns`, `::: notes`, `slide-level`, `markdown+emoji`, callout blocks).
+- When migrating from Quarto to reveal.js, preserve behavior first (fragment timing, navigation flow, note visibility), then adjust visual styling.
+- Do not ship visually generic decks. Each deck must have a deliberate aesthetic direction, typography system, palette strategy, and motion intent.
 
 ## Delivery Checklist
 
