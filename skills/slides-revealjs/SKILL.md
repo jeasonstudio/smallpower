@@ -18,13 +18,14 @@ This skill guides AI to create and update reveal.js slides quickly and reliably.
 
 ## Core Workflow
 
-1. Choose the integration mode: Static HTML (fastest) or npm/ESM (engineering).
-2. If converting from an existing doc, inventory all source sections/items first and map each item to at least one slide.
-3. Build the minimal deck structure: `.reveal > .slides > section`.
-4. Register only required plugins (Markdown, Highlight, Notes, Math, Search, Zoom, etc.).
-5. Author content and interactions: horizontal/vertical slides, fragments, backgrounds, transitions, media.
-6. Configure runtime behavior: navigation, keyboard, `hash`, `slideNumber`, `autoSlide`, `view: 'scroll'`.
-7. Validate and ship: local preview, Speaker View, print/PDF export, and optional API control code.
+1. Analyze the content first and state a content-informed design approach before writing code (topic, tone, audience, branding, and palette rationale).
+2. Choose the integration mode: Static HTML (fastest) or npm/ESM (engineering).
+3. If converting from an existing doc, inventory all source sections/items first and map each item to at least one slide.
+4. Build the minimal deck structure: `.reveal > .slides > section`.
+5. Register only required plugins (Markdown, Highlight, Notes, Math, Search, Zoom, etc.).
+6. Author content and interactions: horizontal/vertical slides, fragments, backgrounds, transitions, media.
+7. Configure runtime behavior: navigation, keyboard, `hash`, `slideNumber`, `autoSlide`, `view: 'scroll'`.
+8. Validate and ship: local preview, Speaker View, print/PDF export, and optional API control code.
 
 ## Implementation Templates
 
@@ -109,6 +110,68 @@ await deck.initialize();
 ## Reveal.js Tips
 
 The items below should be preferred in this skill.
+
+### Design Principles (CRITICAL)
+
+Before creating any presentation, analyze the content and choose design elements intentionally:
+
+1. Consider the subject matter: what is this presentation about, and what tone/industry/mood does it suggest?
+2. Check for branding: if the user mentions a company or organization, align with likely brand identity and colors.
+3. Match palette to content: choose colors that reflect the topic, audience, and communication goal.
+4. State your approach first: explain your design choices before writing slide code.
+
+Required behavior:
+
+- State the content-informed design approach before writing code.
+- Use web-safe fonts (`Arial`, `Helvetica`, `Georgia`, `Verdana`, etc.) or Google Fonts via `@import`.
+- Create clear visual hierarchy through size, weight, and color.
+- Ensure readability with strong contrast, appropriately sized text, and clean alignment.
+- Keep visual consistency across slides: repeated spacing, component patterns, and color language.
+- Always use `pt` units for font sizes in slide CSS/inline styles. Never use `em`, `rem`, or `px` for font-size values.
+
+### Color Palette Selection
+
+Choose colors creatively based on the actual content:
+
+- Think beyond defaults: avoid autopilot palettes.
+- Consider multiple angles: topic, industry, mood, energy level, audience, and mentioned brand identity.
+- Be adventurous when useful: healthcare is not required to be green; finance is not required to be navy.
+- Build a 3-5 color system: dominant colors, supporting tones, and accent colors.
+- Always verify text/background contrast for readability.
+
+Palette references (adapt freely or create your own):
+
+1. Classic Blue: deep navy `#1C2833`, slate gray `#2E4053`, silver `#AAB7B8`, off-white `#F4F6F6`
+2. Teal and Coral: teal `#5EA8A7`, deep teal `#277884`, coral `#FE4447`, white `#FFFFFF`
+3. Bold Red: red `#C0392B`, bright red `#E74C3C`, orange `#F39C12`, yellow `#F1C40F`, green `#2ECC71`
+4. Warm Blush: mauve `#A49393`, blush `#EED6D3`, rose `#E8B4B8`, cream `#FAF7F2`
+5. Burgundy Luxury: burgundy `#5D1D2E`, crimson `#951233`, rust `#C15937`, gold `#997929`
+6. Deep Purple and Emerald: purple `#B165FB`, dark blue `#181B24`, emerald `#40695B`, white `#FFFFFF`
+7. Cream and Forest Green: cream `#FFE1C7`, forest green `#40695B`, white `#FCFCFC`
+8. Pink and Purple: pink `#F8275B`, coral `#FF574A`, rose `#FF737D`, purple `#3D2F68`
+9. Lime and Plum: lime `#C5DE82`, plum `#7C3A5F`, coral `#FD8C6E`, blue-gray `#98ACB5`
+10. Black and Gold: gold `#BF9A4A`, black `#000000`, cream `#F4F6F6`
+11. Sage and Terracotta: sage `#87A96B`, terracotta `#E07A5F`, cream `#F4F1DE`, charcoal `#2C2C2C`
+12. Charcoal and Red: charcoal `#292929`, red `#E33737`, light gray `#CCCBCB`
+13. Vibrant Orange: orange `#F96D00`, light gray `#F2F2F2`, charcoal `#222831`
+14. Forest Green: black `#191A19`, green `#4E9F3D`, dark green `#1E5128`, white `#FFFFFF`
+15. Retro Rainbow: purple `#722880`, pink `#D72D51`, orange `#EB5C18`, amber `#F08800`, gold `#DEB600`
+16. Vintage Earthy: mustard `#E3B448`, sage `#CBD18F`, forest green `#3A6B35`, cream `#F4F1DE`
+17. Coastal Rose: old rose `#AD7670`, beaver `#B49886`, eggshell `#F3ECDC`, ash gray `#BFD5BE`
+18. Orange and Turquoise: light orange `#FC993E`, grayish turquoise `#667C6F`, white `#FCFCFC`
+
+### Slide Content Principles
+
+Even when slides share similar content types, avoid repeating the same visual pattern.
+
+- Vary layout patterns across neighboring slides (columns, stacked blocks, cards, split hero, quote-led).
+- Mix container styles (plain text, styled panels, blockquotes, icon-led callouts).
+- Build hierarchy actively (`<strong>`, color emphasis, type scale, spacing rhythm).
+- Break up long list sequences with visual elements and structural transitions.
+- Do not repeat identical layout structures on consecutive slides.
+- Keep slides scannable: short bullets, one main idea per slide where possible.
+- Use icons (for example Font Awesome) when they improve clarity and pacing.
+- When a slide has less content, increase scale and composition impact instead of leaving sparse tiny text.
 
 ### 30-Second Design Review Checklist
 
@@ -225,7 +288,7 @@ Quarto's `from: markdown+emoji` is not a reveal.js feature. In reveal.js:
 ```html
 <section>
   <h2>It's a candy dog</h2>
-  <p style="font-size: 2em; color: #75aadb;">Would you like to see a candy dog?</p>
+  <p style="font-size: 44pt; color: #75aadb;">Would you like to see a candy dog?</p>
   <img class="fragment fade-up" src="./images/dog.webp" alt="Candy dog" />
 </section>
 ```
@@ -377,13 +440,13 @@ Use a distinctive display face for headings and a separate body face for text-he
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@9..40&family=Manrope:wght@400;500;700;800&display=swap');
 
 .reveal {
-  font-family: 'TsangerJinKai02', 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'Manrope', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .reveal h1,
 .reveal h2,
 .reveal h3 {
-  font-family: 'DM Serif Display', Georgia, serif;
+  font-family: 'DM Serif Display', Georgia, 'Times New Roman', serif;
   letter-spacing: 0.01em;
   line-height: 1.05;
 }
